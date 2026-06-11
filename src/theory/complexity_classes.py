@@ -1,43 +1,43 @@
 """
-Complexity classes analysis through the lens of the
-Computational Uncertainty Principle (CUP/PIC).
+Análisis de clases de complejidad a través del lente del
+Principio de Incertidumbre Computacional (PIC).
 """
 
 import math
 
 
-class ComplexityClass:
-    def __init__(self, name: str, description: str):
-        self.name = name
-        self.description = description
+class ClaseComplejidad:
+    def __init__(self, nombre: str, descripcion: str):
+        self.nombre = nombre
+        self.descripcion = descripcion
 
     def __repr__(self):
-        return f"{self.name}: {self.description}"
+        return f"{self.nombre}: {self.descripcion}"
 
 
-P = ComplexityClass("P", 
+P = ClaseComplejidad("P",
     "Problemas resolubles en tiempo polinómico por una máquina de Turing determinista.")
 
-NP = ComplexityClass("NP",
+NP = ClaseComplejidad("NP",
     "Problemas cuyas soluciones pueden verificarse en tiempo polinómico.")
 
-NP_hard = ComplexityClass("NP-hard",
+NP_hard = ClaseComplejidad("NP-hard",
     "Problemas al menos tan difíciles como cualquier problema en NP.")
 
-NP_complete = ComplexityClass("NP-complete",
+NP_complete = ClaseComplejidad("NP-completo",
     "Problemas que están tanto en NP como en NP-hard.")
 
-coNP = ComplexityClass("coNP",
+coNP = ClaseComplejidad("coNP",
     "Problemas complementarios a los de NP (la respuesta 'no' es verificable).")
 
-PSPACE = ComplexityClass("PSPACE",
+PSPACE = ClaseComplejidad("PSPACE",
     "Problemas resolubles con cantidad polinómica de memoria.")
 
-EXPTIME = ComplexityClass("EXPTIME",
+EXPTIME = ClaseComplejidad("EXPTIME",
     "Problemas resolubles en tiempo exponencial.")
 
 
-CERTIFICATION_GAP_EXAMPLE = """
+EJEMPLO_BRECHA_CERTIFICACION = """
 Bajo el Principio de Incertidumbre Computacional, incluso si P = NP,
 la certificación de optimalidad podría requerir recursos superpolinomiales.
 Esto sugiere una separación más sutil:
@@ -46,52 +46,52 @@ Esto sugiere una separación más sutil:
 """
 
 
-def information_characterization(complexity_class: ComplexityClass) -> str:
-    if complexity_class.name == "P":
+def caracterizacion_informacional(clase: ClaseComplejidad) -> str:
+    if clase.nombre == "P":
         return ("Información adquirible en tiempo polinómico suficiente "
                 "para resolver el problema.")
-    elif complexity_class.name == "NP":
+    elif clase.nombre == "NP":
         return ("Información necesaria para verificar una solución es "
                 "polinómica, pero adquirirla desde cero puede requerir "
                 "información superpolinómica.")
-    elif complexity_class.name == "NP-complete":
+    elif clase.nombre == "NP-completo":
         return ("El espacio de soluciones tiene entropía superpolinómica, "
                 "y ningún algoritmo polinómico puede certificar optimalidad "
                 "en el peor caso.")
-    elif complexity_class.name == "coNP":
+    elif clase.nombre == "coNP":
         return ("Requiere certificados universales ('para toda asignación...'), "
                 "que desde la perspectiva del PIC demandan más información.")
     return "No hay caracterización informacional disponible."
 
 
-def entropy_of_complexity_class(n: int, class_name: str) -> float:
-    if class_name == "P":
+def entropia_clase_complejidad(n: int, nombre_clase: str) -> float:
+    if nombre_clase == "P":
         return n * math.log2(n)
-    elif class_name == "NP":
+    elif nombre_clase == "NP":
         return math.log2(2**n)
-    elif class_name == "NP-complete":
+    elif nombre_clase == "NP-completo":
         return math.log2(math.factorial(n))
-    elif class_name == "PSPACE":
+    elif nombre_clase == "PSPACE":
         return n**2
-    elif class_name == "EXPTIME":
+    elif nombre_clase == "EXPTIME":
         return 2**n
     return 0.0
 
 
 if __name__ == "__main__":
     print("=" * 60)
-    print("Complexity Classes - PIC Perspective")
+    print("Clases de Complejidad - Perspectiva del PIC")
     print("=" * 60)
 
-    classes = [P, NP, NP_hard, NP_complete, coNP, PSPACE, EXPTIME]
-    for cls in classes:
-        print(f"\n{cls.name}")
-        print(f"  {cls.description}")
-        print(f"  Caracterización informacional: {information_characterization(cls)}")
+    clases = [P, NP, NP_hard, NP_complete, coNP, PSPACE, EXPTIME]
+    for cls in clases:
+        print(f"\n{cls.nombre}")
+        print(f"  {cls.descripcion}")
+        print(f"  Caracterización informacional: {caracterizacion_informacional(cls)}")
 
     print("\n" + "=" * 60)
-    print("Entropy comparison for n=100:")
+    print("Comparación de entropía para n=100:")
     print("-" * 60)
-    for name in ["P", "NP", "NP-complete", "PSPACE", "EXPTIME"]:
-        ent = entropy_of_complexity_class(100, name)
-        print(f"  {name:15} ~ {ent:.1f} bits")
+    for nombre in ["P", "NP", "NP-completo", "PSPACE", "EXPTIME"]:
+        ent = entropia_clase_complejidad(100, nombre)
+        print(f"  {nombre:15} ~ {ent:.1f} bits")

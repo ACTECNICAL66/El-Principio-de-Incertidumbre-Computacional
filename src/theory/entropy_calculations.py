@@ -1,19 +1,19 @@
 """
-Implementation of the Computational Uncertainty Principle for TSP
-- Entropy of solution spaces
-- Information bounds for polynomial-time algorithms
-- Certification gap analysis
+Implementación del Principio de Incertidumbre Computacional para TSP
+- Entropía del espacio de soluciones
+- Límites de información para algoritmos en tiempo polinómico
+- Análisis de la brecha de certificación
 """
 
 import math
 from typing import Callable, Dict, Any
 
 
-class ComputationalUncertaintyTSP:
-    def __init__(self, n_cities: int):
-        self.n = n_cities
+class IncertidumbreComputacionalTSP:
+    def __init__(self, n_ciudades: int):
+        self.n = n_ciudades
 
-    def solution_space_entropy(self) -> float:
+    def entropia_espacio_soluciones(self) -> float:
         if self.n <= 1:
             return 0.0
         if self.n > 20:
@@ -25,69 +25,69 @@ class ComputationalUncertaintyTSP:
             H = math.log(factorial / 2, 2)
         return H
 
-    def polynomial_information_bound(self, time_complexity: Callable) -> float:
-        max_ops = time_complexity(self.n)
+    def cota_informacion_polinomica(self, complejidad_tiempo: Callable) -> float:
+        max_ops = complejidad_tiempo(self.n)
         return max_ops
 
-    def residual_uncertainty(self, time_complexity: Callable) -> float:
-        H_total = self.solution_space_entropy()
-        I_acquired = self.polynomial_information_bound(time_complexity)
-        return max(H_total - I_acquired, 0)
+    def incertidumbre_residual(self, complejidad_tiempo: Callable) -> float:
+        H_total = self.entropia_espacio_soluciones()
+        I_adquirida = self.cota_informacion_polinomica(complejidad_tiempo)
+        return max(H_total - I_adquirida, 0)
 
-    def certification_gap(self, algorithm_name: str) -> Dict[str, Any]:
-        algorithms = {
-            'brute_force': lambda n: math.factorial(n),
-            'dynamic_prog': lambda n: n**2 * 2**n,
+    def brecha_certificacion(self, nombre_algoritmo: str) -> Dict[str, Any]:
+        algoritmos = {
+            'fuerza_bruta': lambda n: math.factorial(n),
+            'prog_dinamica': lambda n: n**2 * 2**n,
             'christofides': lambda n: n**3,
-            'greedy': lambda n: n**2,
+            'voraz': lambda n: n**2,
             '2-opt': lambda n: n**3,
         }
-        if algorithm_name not in algorithms:
-            raise ValueError(f"Unknown algorithm: {algorithm_name}")
+        if nombre_algoritmo not in algoritmos:
+            raise ValueError(f"Algoritmo desconocido: {nombre_algoritmo}")
 
-        time_func = algorithms[algorithm_name]
-        H_total = self.solution_space_entropy()
-        I_max = self.polynomial_information_bound(time_func)
-        H_residual = self.residual_uncertainty(time_func)
+        func_tiempo = algoritmos[nombre_algoritmo]
+        H_total = self.entropia_espacio_soluciones()
+        I_max = self.cota_informacion_polinomica(func_tiempo)
+        H_residual = self.incertidumbre_residual(func_tiempo)
 
         return {
-            'algorithm': algorithm_name,
-            'n_cities': self.n,
-            'total_entropy_bits': H_total,
-            'max_info_acquired_bits': I_max,
-            'residual_uncertainty_bits': H_residual,
-            'certification_possible': H_residual < 1e-9
+            'algoritmo': nombre_algoritmo,
+            'n_ciudades': self.n,
+            'entropia_total_bits': H_total,
+            'info_max_adquirida_bits': I_max,
+            'incertidumbre_residual_bits': H_residual,
+            'certificacion_posible': H_residual < 1e-9
         }
 
 
-def tsp_shannon_entropy(n: int) -> float:
+def entropia_shannon_tsp(n: int) -> float:
     if n <= 1:
         return 0.0
     num_tours = math.factorial(n - 1) // 2
     return math.log2(num_tours)
 
 
-def landauer_energy_limit(bits_acquired: float, temperature: float = 300.0) -> float:
+def limite_energia_landauer(bits_adquiridos: float, temperatura: float = 300.0) -> float:
     k_B = 1.380649e-23
-    return bits_acquired * k_B * temperature * math.log(2)
+    return bits_adquiridos * k_B * temperatura * math.log(2)
 
 
 if __name__ == "__main__":
     print("=" * 60)
-    print("Computational Uncertainty Principle - Entropy Analysis")
+    print("PRINCIPIO DE INCERTIDUMBRE COMPUTACIONAL - Análisis de Entropía")
     print("=" * 60)
     for n in [10, 20, 50, 100]:
-        analyzer = ComputationalUncertaintyTSP(n)
-        print(f"\nTSP with n = {n} cities")
+        analizador = IncertidumbreComputacionalTSP(n)
+        print(f"\nTSP con n = {n} ciudades")
         print("-" * 40)
-        H_total = analyzer.solution_space_entropy()
-        print(f"Solution space entropy: {H_total:.2f} bits")
-        print(f"Energy limit (Landauer): {landauer_energy_limit(H_total):.2e} J")
+        H_total = analizador.entropia_espacio_soluciones()
+        print(f"Entropía del espacio de soluciones: {H_total:.2f} bits")
+        print(f"Límite energético (Landauer): {limite_energia_landauer(H_total):.2e} J")
 
-        for algo in ['brute_force', 'dynamic_prog', 'christofides', 'greedy']:
+        for algo in ['fuerza_bruta', 'prog_dinamica', 'christofides', 'voraz']:
             try:
-                result = analyzer.certification_gap(algo)
-                cert = "YES" if result['certification_possible'] else "NO"
-                print(f"  {algo:15} | Residual uncertainty: {result['residual_uncertainty_bits']:.2f} bits | Certify: {cert}")
+                resultado = analizador.brecha_certificacion(algo)
+                cert = "SÍ" if resultado['certificacion_posible'] else "NO"
+                print(f"  {algo:15} | Incertidumbre residual: {resultado['incertidumbre_residual_bits']:.2f} bits | Certifica: {cert}")
             except Exception:
                 pass

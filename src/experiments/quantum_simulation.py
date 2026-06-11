@@ -14,34 +14,33 @@ import math
 import random
 
 
-def quantum_information_bound(T: int, max_qubits: int) -> float:
+def cota_informacion_cuantica(T: int, max_qubits: int) -> float:
     return min(T, max_qubits)
 
 
-def shor_entropy_reduction(n_bits: int) -> float:
-    bits_factorization = n_bits
-    return bits_factorization
+def reduccion_entropia_shor(n_bits: int) -> float:
+    return n_bits
 
 
-def quantum_tsp_limit(n_cities: int) -> float:
-    H0 = math.log2(math.factorial(n_cities - 1) // 2)
+def limite_tsp_cuantico(n_ciudades: int) -> float:
+    H0 = math.log2(math.factorial(n_ciudades - 1) // 2)
     return H0
 
 
-def grover_search_speedup(n_items: int) -> float:
-    return math.sqrt(n_items)
+def aceleracion_grover(n_elementos: int) -> float:
+    return math.sqrt(n_elementos)
 
 
-def simulate_quantum_oracle(n_qubits: int, target_state: int, shots: int = 1024):
-    results = {}
-    for _ in range(shots):
-        meas = random.randint(0, (1 << n_qubits) - 1)
+def simular_oraculo_cuantico(n_qubits: int, estado_objetivo: int, mediciones: int = 1024):
+    resultados = {}
+    for _ in range(mediciones):
+        medida = random.randint(0, (1 << n_qubits) - 1)
         prob = 1.0 / (1 << n_qubits)
-        if meas == target_state:
+        if medida == estado_objetivo:
             prob += 0.5
         if random.random() < prob:
-            results[meas] = results.get(meas, 0) + 1
-    return results
+            resultados[medida] = resultados.get(medida, 0) + 1
+    return resultados
 
 
 if __name__ == "__main__":
@@ -51,28 +50,28 @@ if __name__ == "__main__":
 
     print("\n--- Límite de Shor (Factorización) ---")
     for bits in [16, 32, 64, 128, 256]:
-        ent = shor_entropy_reduction(bits)
+        ent = reduccion_entropia_shor(bits)
         print(f"  n={bits:3d} bits | entropía de factorización: {ent:.1f} bits | "
               f"Shor requiere O({bits**3}) operaciones cuánticas")
 
     print("\n--- Límite Informacional Cuántico para TSP ---")
     for n in [10, 20, 50, 100]:
-        H0 = quantum_tsp_limit(n)
-        q_bound = quantum_information_bound(n**3, n)
-        residual = max(H0 - q_bound, 0)
-        print(f"  n={n:3d} | H0={H0:.1f} bits | info cuántica max={q_bound:.1f} | "
+        H0 = limite_tsp_cuantico(n)
+        cota_q = cota_informacion_cuantica(n**3, n)
+        residual = max(H0 - cota_q, 0)
+        print(f"  n={n:3d} | H0={H0:.1f} bits | info cuántica max={cota_q:.1f} | "
               f"residual={residual:.1f} bits | certificable={residual < 1e-9}")
 
     print("\n--- Aceleración de Grover ---")
     for n in [100, 1000, 10**6, 10**9]:
-        sqrt_n = grover_search_speedup(n)
-        print(f"  N={n:10d} | búsqueda clásica O(N)={n} | Grover O(√N)={sqrt_n:.0f}")
+        raiz = aceleracion_grover(n)
+        print(f"  N={n:10d} | búsqueda clásica O(N)={n} | Grover O(√N)={raiz:.0f}")
 
     print("\n--- Simulación de Oracle Cuántico ---")
     n_qubits = 4
-    target = 7
-    results = simulate_quantum_oracle(n_qubits, target, shots=2048)
-    top_states = sorted(results.items(), key=lambda x: -x[1])[:5]
-    print(f"  Qubits: {n_qubits}, Estado objetivo: |{target}⟩")
-    for state, count in top_states:
-        print(f"    |{state}⟩: {count} mediciones ({count/2048*100:.1f}%)")
+    objetivo = 7
+    resultados = simular_oraculo_cuantico(n_qubits, objetivo, mediciones=2048)
+    estados_top = sorted(resultados.items(), key=lambda x: -x[1])[:5]
+    print(f"  Qubits: {n_qubits}, Estado objetivo: |{objetivo}⟩")
+    for estado, conteo in estados_top:
+        print(f"    |{estado}⟩: {conteo} mediciones ({conteo/2048*100:.1f}%)")

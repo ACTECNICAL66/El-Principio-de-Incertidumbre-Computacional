@@ -10,80 +10,80 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 try:
     import matplotlib.pyplot as plt
-    HAS_MPL = True
+    TIENE_MPL = True
 except ImportError:
-    HAS_MPL = False
+    TIENE_MPL = False
 
 
-ALGORITHM_INFO = {
+INFO_ALGORITMOS = {
     'Fuerza Bruta': {
-        'complexity': 'O(n!)',
-        'guarantee': 'Optimalidad global',
-        'max_feasible_n': 15,
+        'complejidad': 'O(n!)',
+        'garantia': 'Optimalidad global',
+        'n_max_factible': 15,
         'color': 'red',
     },
     'Prog. Dinámica': {
-        'complexity': 'O(n²2ⁿ)',
-        'guarantee': 'Optimalidad global',
-        'max_feasible_n': 25,
+        'complejidad': 'O(n²2ⁿ)',
+        'garantia': 'Optimalidad global',
+        'n_max_factible': 25,
         'color': 'orange',
     },
     'Christofides': {
-        'complexity': 'O(n³)',
-        'guarantee': '1.5-aproximación',
-        'max_feasible_n': 1000,
+        'complejidad': 'O(n³)',
+        'garantia': '1.5-aproximación',
+        'n_max_factible': 1000,
         'color': 'green',
     },
     'Vecino Cercano': {
-        'complexity': 'O(n²)',
-        'guarantee': 'Sin garantía',
-        'max_feasible_n': 10000,
+        'complejidad': 'O(n²)',
+        'garantia': 'Sin garantía',
+        'n_max_factible': 10000,
         'color': 'blue',
     },
     '2-opt': {
-        'complexity': 'O(n²·iter)',
-        'guarantee': 'Óptimo local',
-        'max_feasible_n': 5000,
+        'complejidad': 'O(n²·iter)',
+        'garantia': 'Óptimo local',
+        'n_max_factible': 5000,
         'color': 'purple',
     },
     'Recocido Simulado': {
-        'complexity': 'O(iter·n²)',
-        'guarantee': 'Probabilística',
-        'max_feasible_n': 5000,
+        'complejidad': 'O(iter·n²)',
+        'garantia': 'Probabilística',
+        'n_max_factible': 5000,
         'color': 'cyan',
     },
 }
 
 
-def estimate_runtime(algorithm: str, n: int) -> float:
-    ops_per_second = 1e8
-    if algorithm == 'Fuerza Bruta':
+def estimar_tiempo_ejecucion(algoritmo: str, n: int) -> float:
+    ops_por_segundo = 1e8
+    if algoritmo == 'Fuerza Bruta':
         ops = math.factorial(n)
-    elif algorithm == 'Prog. Dinámica':
+    elif algoritmo == 'Prog. Dinámica':
         ops = n**2 * 2**n
-    elif algorithm == 'Christofides':
+    elif algoritmo == 'Christofides':
         ops = n**3
-    elif algorithm == 'Vecino Cercano':
+    elif algoritmo == 'Vecino Cercano':
         ops = n**2
-    elif algorithm in ('2-opt', 'Recocido Simulado'):
+    elif algoritmo in ('2-opt', 'Recocido Simulado'):
         ops = n**2 * 1000
     else:
         ops = n**3
-    return ops / ops_per_second
+    return ops / ops_por_segundo
 
 
-def compute_quality_ratio(algorithm: str, n: int) -> float:
-    if algorithm == 'Fuerza Bruta':
+def calcular_ratio_calidad(algoritmo: str, n: int) -> float:
+    if algoritmo == 'Fuerza Bruta':
         return 1.0
-    elif algorithm == 'Prog. Dinámica':
+    elif algoritmo == 'Prog. Dinámica':
         return 1.0
-    elif algorithm == 'Christofides':
+    elif algoritmo == 'Christofides':
         return 1.5
-    elif algorithm == 'Vecino Cercano':
+    elif algoritmo == 'Vecino Cercano':
         return 1.0 + 0.5 * math.log(n) / math.log(10)
-    elif algorithm == '2-opt':
+    elif algoritmo == '2-opt':
         return 1.0 + 0.1 * math.log(n) / math.log(10)
-    elif algorithm == 'Recocido Simulado':
+    elif algoritmo == 'Recocido Simulado':
         return 1.0 + 0.05 * math.log(n) / math.log(10)
     return 2.0
 
@@ -95,14 +95,14 @@ if __name__ == "__main__":
 
     print(f"\n{'Algoritmo':20} {'Complejidad':20} {'Garantía':22} {'n máx':8}")
     print("-" * 70)
-    for name, info in ALGORITHM_INFO.items():
-        print(f"{name:20} {info['complexity']:20} {info['guarantee']:22} {info['max_feasible_n']:<8}")
+    for nombre, info in INFO_ALGORITMOS.items():
+        print(f"{nombre:20} {info['complejidad']:20} {info['garantia']:22} {info['n_max_factible']:<8}")
 
     print("\n--- Estimación de tiempos de ejecución ---")
     for n in [10, 20, 50, 100]:
         print(f"\nn = {n}:")
         for algo in ['Fuerza Bruta', 'Prog. Dinámica', 'Christofides', 'Vecino Cercano']:
-            t = estimate_runtime(algo, n)
+            t = estimar_tiempo_ejecucion(algo, n)
             if t < 1:
                 print(f"  {algo:20} {t*1000:.4f} ms")
             elif t < 60:
@@ -114,16 +114,16 @@ if __name__ == "__main__":
     for n in [10, 50, 100]:
         print(f"\nn = {n}:")
         for algo in ['Fuerza Bruta', 'Christofides', 'Vecino Cercano', '2-opt', 'Recocido Simulado']:
-            q = compute_quality_ratio(algo, n)
+            q = calcular_ratio_calidad(algo, n)
             print(f"  {algo:20} ratio={q:.3f}")
 
-    if HAS_MPL:
+    if TIENE_MPL:
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 5))
 
         ns = list(range(2, 31))
         for algo in ['Vecino Cercano', 'Christofides', 'Fuerza Bruta']:
-            times = [estimate_runtime(algo, n) for n in ns]
-            ax1.plot(ns, times, label=algo, linewidth=2)
+            tiempos = [estimar_tiempo_ejecucion(algo, n) for n in ns]
+            ax1.plot(ns, tiempos, label=algo, linewidth=2)
         ax1.set_yscale('log')
         ax1.set_xlabel('n')
         ax1.set_ylabel('Tiempo estimado (s)')
@@ -133,7 +133,7 @@ if __name__ == "__main__":
 
         ns2 = list(range(5, 101))
         for algo in ['Vecino Cercano', 'Christofides', '2-opt', 'Recocido Simulado']:
-            ratios = [compute_quality_ratio(algo, n) for n in ns2]
+            ratios = [calcular_ratio_calidad(algo, n) for n in ns2]
             ax2.plot(ns2, ratios, label=algo, linewidth=2)
         ax2.set_xlabel('n')
         ax2.set_ylabel('Ratio respecto al óptimo')
@@ -142,6 +142,6 @@ if __name__ == "__main__":
         ax2.grid(True, alpha=0.3)
 
         plt.tight_layout()
-        plt.savefig('algorithm_performance.png', dpi=150)
+        plt.savefig('rendimiento_algoritmos.png', dpi=150)
         plt.close()
-        print("\nGráfico guardado: algorithm_performance.png")
+        print("\nGráfico guardado: rendimiento_algoritmos.png")

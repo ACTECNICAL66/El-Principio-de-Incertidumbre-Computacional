@@ -1,77 +1,80 @@
 """
-Lower bounds for TSP and NP-hard problems using information-theoretic arguments.
-Implements the adversarial query model and informational barrier theorem.
+Cotas inferiores para TSP y problemas NP-duros usando argumentos
+informacionales. Implementa el modelo de consulta adversarial
+y el teorema de la barrera informacional.
 """
 
 import math
-from typing import List, Tuple, Set
+from typing import List, Tuple
 import random
 
 
-def information_barrier_theorem(n: int, entropy_func) -> Tuple[float, float]:
-    H0 = entropy_func(n)
+def teorema_barrera_informacional(n: int, func_entropia) -> float:
+    H0 = func_entropia(n)
     return H0
 
 
-def query_lower_bound_tsp(n: int) -> int:
-    groups = n // 2
-    cross_pairs = groups * (n - groups)
-    return cross_pairs
+def cota_inferior_consultas_tsp(n: int) -> int:
+    grupos = n // 2
+    pares_cruzados = grupos * (n - grupos)
+    return pares_cruzados
 
 
-def adversarial_tsp_instance(n: int, seed: int = 42) -> Tuple[List[int], List[int], float]:
-    random.seed(seed)
-    group_a = list(range(n // 2))
-    group_b = list(range(n // 2, n))
-    a_secret = random.choice(group_a)
-    b_secret = random.choice(group_b)
-    return group_a, group_b, (a_secret, b_secret)
+def instancia_adversarial_tsp(n: int, semilla: int = 42) -> Tuple[List[int], List[int], Tuple[int, int]]:
+    random.seed(semilla)
+    grupo_a = list(range(n // 2))
+    grupo_b = list(range(n // 2, n))
+    a_secreto = random.choice(grupo_a)
+    b_secreto = random.choice(grupo_b)
+    return grupo_a, grupo_b, (a_secreto, b_secreto)
 
 
-class AdversarialOracle:
-    def __init__(self, n: int, seed: int = 42):
+class OraculoAdversarial:
+    def __init__(self, n: int, semilla: int = 42):
         self.n = n
-        random.seed(seed)
-        self.group_a = list(range(n // 2))
-        self.group_b = list(range(n // 2, n))
-        self.secret_a = random.choice(self.group_a)
-        self.secret_b = random.choice(self.group_b)
-        self.queries_made = 0
+        random.seed(semilla)
+        self.grupo_a = list(range(n // 2))
+        self.grupo_b = list(range(n // 2, n))
+        self.secreto_a = random.choice(self.grupo_a)
+        self.secreto_b = random.choice(self.grupo_b)
+        self.consultas_realizadas = 0
         self.M = n * 10
 
-    def query(self, i: int, j: int) -> float:
-        self.queries_made += 1
+    def consultar(self, i: int, j: int) -> float:
+        self.consultas_realizadas += 1
         if i == j:
             return 0.0
-        in_same_group = ((i in self.group_a and j in self.group_a) or
-                         (i in self.group_b and j in self.group_b))
-        is_secret_pair = ((i == self.secret_a and j == self.secret_b) or
-                          (i == self.secret_b and j == self.secret_a))
-        if is_secret_pair:
+        mismo_grupo = ((i in self.grupo_a and j in self.grupo_a) or
+                       (i in self.grupo_b and j in self.grupo_b))
+        es_par_secreto = ((i == self.secreto_a and j == self.secreto_b) or
+                          (i == self.secreto_b and j == self.secreto_a))
+        if es_par_secreto:
             return 1.0
-        elif in_same_group:
+        elif mismo_grupo:
             return 1.0
         else:
             return float(self.M)
 
-    def get_queries(self) -> int:
-        return self.queries_made
+    def obtener_consultas(self) -> int:
+        return self.consultas_realizadas
 
 
-def tsp_decision_tree_lower_bound(n: int) -> float:
+def cota_inferior_arbol_decision_tsp(n: int) -> float:
     num_tours = math.factorial(n - 1) // 2
     return math.ceil(math.log2(num_tours))
 
 
 if __name__ == "__main__":
     print("=" * 60)
-    print("Information Barrier Theorem - Lower Bounds")
+    print("TEOREMA DE LA BARRERA INFORMACIONAL - Cotas Inferiores")
     print("=" * 60)
 
     for n in [10, 20, 50, 100]:
-        q_lower = tsp_decision_tree_lower_bound(n)
-        adv_bound = query_lower_bound_tsp(n)
+        cota_arbol = cota_inferior_arbol_decision_tsp(n)
+        cota_adv = cota_inferior_consultas_tsp(n)
         print(f"\nn = {n}:")
-        print(f"  Decision tree lower bound: {q_lower} queries")
-        print(f"  Adversarial lower bound: ~{adv_bound} queries (O(n^2))")
-        print(f"  Landauer energy lower bound: {q_lower * 1.380649e-23 * 300 * math.log(2):.2e} J")
+        print(f"  Cota inferior árbol decisión: {cota_arbol} consultas")
+        print(f"  Cota adversarial: ~{cota_adv} consultas (O(n²))")
+        k_B = 1.380649e-23
+        T = 300
+        print(f"  Límite energía Landauer: {cota_arbol * k_B * T * math.log(2):.2e} J")
